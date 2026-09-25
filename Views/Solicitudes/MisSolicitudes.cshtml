@@ -6,7 +6,15 @@
 
 <div class="container mt-4">
     <h2>Mis Solicitudes de Crédito</h2>
-<!-- Mensaje de éxito -->
+
+    @if (ViewBag.UltimaVista != null)
+    {
+        <div class="alert alert-info mt-2">
+            <strong>Reciente:</strong> La última solicitud que revisaste fue la #@ViewBag.UltimaVista.
+        </div>
+    }
+
+    <!-- Mensaje de éxito -->
     @if (TempData["MensajeExito"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
@@ -19,6 +27,7 @@
     <div class="mb-3 mt-3">
         <a asp-action="Crear" class="btn btn-success">Nueva Solicitud</a>
     </div>
+
     <!-- Formulario de Filtros -->
     <div class="card mb-4">
         <div class="card-body">
