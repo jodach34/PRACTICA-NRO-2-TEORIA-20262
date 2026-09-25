@@ -1,0 +1,47 @@
+@model IEnumerable<PRACTICA_NRO_2_TEORIA_20262.Models.SolicitudCredito>
+
+@{ ViewData["Title"] = "Panel de Analista"; }
+
+<div class="container mt-4">
+    <h2>Solicitudes Pendientes de Evaluación</h2>
+
+    @if (TempData["Exito"] != null)
+    {
+        <div class="alert alert-success mt-3">@TempData["Exito"]</div>
+    }
+
+    <table class="table table-striped mt-4">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Fecha</th>
+                <th>Cliente ID</th>
+                <th>Ingresos M.</th>
+                <th>Monto Solicitado</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>@item.FechaSolicitud.ToString("dd/MM/yyyy")</td>
+                        <td>@item.ClienteId</td>
+                        <td>@item.Cliente?.IngresosMensuales.ToString("C")</td>
+                        <td><strong>@item.MontoSolicitado.ToString("C")</strong></td>
+                        <td>
+                            <a asp-action="Evaluar" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Evaluar</a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="6" class="text-center">No hay solicitudes pendientes en este momento.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
