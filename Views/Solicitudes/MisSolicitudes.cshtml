@@ -7,6 +7,13 @@
 <div class="container mt-4">
     <h2>Mis Solicitudes de Crédito</h2>
 
+    @if (ViewBag.UltimaVista != null)
+    {
+        <div class="alert alert-info mt-2">
+            <strong>Reciente:</strong> La última solicitud que revisaste fue la #@ViewBag.UltimaVista.
+        </div>
+    }
+
     <!-- Formulario de Filtros -->
     <div class="card mb-4">
         <div class="card-body">
