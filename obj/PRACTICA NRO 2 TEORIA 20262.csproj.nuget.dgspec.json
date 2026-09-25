@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\JOEL CONDOR\\Desktop\\PROGRAMACION 1\\PRACTICA NRO 2 TEORIA 20262\\PRACTICA NRO 2 TEORIA 20262.csproj": {}
+    "c:\\Users\\JOEL CONDOR\\Desktop\\PROGRAMACION 1\\PRACTICA NRO 2 TEORIA 20262\\PRACTICA NRO 2 TEORIA 20262.csproj": {}
   },
   "projects": {
-    "C:\\Users\\JOEL CONDOR\\Desktop\\PROGRAMACION 1\\PRACTICA NRO 2 TEORIA 20262\\PRACTICA NRO 2 TEORIA 20262.csproj": {
+    "c:\\Users\\JOEL CONDOR\\Desktop\\PROGRAMACION 1\\PRACTICA NRO 2 TEORIA 20262\\PRACTICA NRO 2 TEORIA 20262.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\JOEL CONDOR\\Desktop\\PROGRAMACION 1\\PRACTICA NRO 2 TEORIA 20262\\PRACTICA NRO 2 TEORIA 20262.csproj",
+        "projectUniqueName": "c:\\Users\\JOEL CONDOR\\Desktop\\PROGRAMACION 1\\PRACTICA NRO 2 TEORIA 20262\\PRACTICA NRO 2 TEORIA 20262.csproj",
         "projectName": "PRACTICA NRO 2 TEORIA 20262",
-        "projectPath": "C:\\Users\\JOEL CONDOR\\Desktop\\PROGRAMACION 1\\PRACTICA NRO 2 TEORIA 20262\\PRACTICA NRO 2 TEORIA 20262.csproj",
+        "projectPath": "c:\\Users\\JOEL CONDOR\\Desktop\\PROGRAMACION 1\\PRACTICA NRO 2 TEORIA 20262\\PRACTICA NRO 2 TEORIA 20262.csproj",
         "packagesPath": "C:\\Users\\JOEL CONDOR\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\JOEL CONDOR\\Desktop\\PROGRAMACION 1\\PRACTICA NRO 2 TEORIA 20262\\obj\\",
+        "outputPath": "c:\\Users\\JOEL CONDOR\\Desktop\\PROGRAMACION 1\\PRACTICA NRO 2 TEORIA 20262\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\JOEL CONDOR\\AppData\\Roaming\\NuGet\\NuGet.Config"
