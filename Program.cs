@@ -37,6 +37,8 @@ builder.Services.AddSession(options =>
 // 3. Configurar WebSockets con SignalR (Pregunta 6)
 builder.Services.AddSignalR();
 
+// 4. Configurar RabbitMQ Consumer (Pregunta 7)
+builder.Services.AddHostedService<PRACTICA_NRO_2_TEORIA_20262.Services.NotificacionesConsumerService>();
 // --------------------------------------------------------------
 
 var app = builder.Build();

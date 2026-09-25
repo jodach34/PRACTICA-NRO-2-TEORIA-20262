@@ -27,7 +27,12 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Solicitudes" asp-action="MisSolicitudes">Mis Solicitudes</a>
                         </li>
                         
-                        <!-- ENLACE PARA EL ANALISTA AGREGADO AQUÍ -->
+                        <!-- ENLACE PARA NOTIFICACIONES AGREGADO AQUÍ -->
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Notificaciones" asp-action="Index">Mis Notificaciones</a>
+                        </li>
+                        
+                        <!-- ENLACE PARA EL ANALISTA -->
                         @if (User.IsInRole("Analista"))
                         {
                             <li class="nav-item fw-bold">

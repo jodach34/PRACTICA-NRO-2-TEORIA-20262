@@ -1,0 +1,32 @@
+@model IEnumerable<PRACTICA_NRO_2_TEORIA_20262.Models.Notificacion>
+@{ ViewData["Title"] = "Mis Notificaciones"; }
+
+<div class="container mt-4">
+    <h2>Mis Notificaciones</h2>
+    <table class="table table-striped mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Fecha Recepción</th>
+                <th>Mensaje</th>
+                <th>ID Solicitud</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.FechaProcesamientoUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</td>
+                        <td>@item.Texto</td>
+                        <td>#@item.SolicitudId</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="3" class="text-center">No tienes notificaciones recientes.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>

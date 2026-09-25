@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\JOEL CONDOR\\Desktop\\PROGRAMACION 1\\PRACTICA NRO 2 TEORIA 20262\\PRACTICA NRO 2 TEORIA 20262.csproj": {}
+    "C:\\Users\\JOEL CONDOR\\Desktop\\PROGRAMACION 1\\PRACTICA NRO 2 TEORIA 20262\\PRACTICA NRO 2 TEORIA 20262.csproj": {}
   },
   "projects": {
-    "c:\\Users\\JOEL CONDOR\\Desktop\\PROGRAMACION 1\\PRACTICA NRO 2 TEORIA 20262\\PRACTICA NRO 2 TEORIA 20262.csproj": {
+    "C:\\Users\\JOEL CONDOR\\Desktop\\PROGRAMACION 1\\PRACTICA NRO 2 TEORIA 20262\\PRACTICA NRO 2 TEORIA 20262.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\JOEL CONDOR\\Desktop\\PROGRAMACION 1\\PRACTICA NRO 2 TEORIA 20262\\PRACTICA NRO 2 TEORIA 20262.csproj",
+        "projectUniqueName": "C:\\Users\\JOEL CONDOR\\Desktop\\PROGRAMACION 1\\PRACTICA NRO 2 TEORIA 20262\\PRACTICA NRO 2 TEORIA 20262.csproj",
         "projectName": "PRACTICA NRO 2 TEORIA 20262",
-        "projectPath": "c:\\Users\\JOEL CONDOR\\Desktop\\PROGRAMACION 1\\PRACTICA NRO 2 TEORIA 20262\\PRACTICA NRO 2 TEORIA 20262.csproj",
+        "projectPath": "C:\\Users\\JOEL CONDOR\\Desktop\\PROGRAMACION 1\\PRACTICA NRO 2 TEORIA 20262\\PRACTICA NRO 2 TEORIA 20262.csproj",
         "packagesPath": "C:\\Users\\JOEL CONDOR\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\JOEL CONDOR\\Desktop\\PROGRAMACION 1\\PRACTICA NRO 2 TEORIA 20262\\obj\\",
+        "outputPath": "C:\\Users\\JOEL CONDOR\\Desktop\\PROGRAMACION 1\\PRACTICA NRO 2 TEORIA 20262\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\JOEL CONDOR\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -74,6 +74,10 @@
             "Microsoft.Extensions.Caching.StackExchangeRedis": {
               "target": "Package",
               "version": "[10.0.12, )"
+            },
+            "RabbitMQ.Client": {
+              "target": "Package",
+              "version": "[7.2.2, )"
             }
           },
           "imports": [

@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
+using RabbitMQ.Client;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PRACTICA_NRO_2_TEORIA_20262.Data;
@@ -15,41 +17,38 @@ namespace PRACTICA_NRO_2_TEORIA_20262.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly IDistributedCache _cache; // <-- Herramienta de Redis
+        private readonly IDistributedCache _cache;
+        private readonly IConfiguration _config; // <-- Agregamos para leer el appsettings.json
 
-        // Inyectamos el caché en el constructor
-        public SolicitudesController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IDistributedCache cache)
+        public SolicitudesController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IDistributedCache cache, IConfiguration config)
         {
             _context = context;
             _userManager = userManager;
             _cache = cache;
+            _config = config;
         }
 
         // GET: Solicitudes/MisSolicitudes
         public async Task<IActionResult> MisSolicitudes(FiltroSolicitudesViewModel filtro)
         {
             var userId = _userManager.GetUserId(User);
-            
-            // Leemos la Sesión para saber cuál fue la última solicitud que vio
             var ultimaVista = HttpContext.Session.GetInt32("UltimaSolicitudId");
             ViewBag.UltimaVista = ultimaVista;
 
             string cacheKey = $"solicitudes_{userId}";
             bool usaFiltros = filtro.Estado.HasValue || filtro.MontoMinimo.HasValue || filtro.MontoMaximo.HasValue || filtro.FechaInicio.HasValue || filtro.FechaFin.HasValue;
 
-            // 1. INTENTAR LEER DEL CACHÉ REDIS (Solo si no hay filtros aplicados)
             if (!usaFiltros)
             {
                 var cachedData = await _cache.GetStringAsync(cacheKey);
                 if (!string.IsNullOrEmpty(cachedData))
                 {
-                    var jsonOptions = new JsonSerializerOptions { ReferenceHandler = ReferenceHandler.IgnoreCycles };
-                    filtro.Solicitudes = JsonSerializer.Deserialize<List<SolicitudCredito>>(cachedData, jsonOptions)!;
+                    var jsonOpts = new JsonSerializerOptions { ReferenceHandler = ReferenceHandler.IgnoreCycles };
+                    filtro.Solicitudes = JsonSerializer.Deserialize<List<SolicitudCredito>>(cachedData, jsonOpts)!;
                     return View(filtro);
                 }
             }
 
-            // Si hay filtros o no hay caché, consultamos a la Base de Datos
             if (filtro.FechaInicio.HasValue && filtro.FechaFin.HasValue && filtro.FechaInicio > filtro.FechaFin)
             {
                 ModelState.AddModelError(string.Empty, "La fecha de inicio no puede ser mayor a la fecha de fin.");
@@ -68,12 +67,11 @@ namespace PRACTICA_NRO_2_TEORIA_20262.Controllers
 
             filtro.Solicitudes = await query.OrderByDescending(s => s.FechaSolicitud).ToListAsync();
 
-            // 2. GUARDAR EN EL CACHÉ REDIS (Si es la lista general)
             if (!usaFiltros && filtro.Solicitudes.Any())
             {
                 var options = new DistributedCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
-                var jsonOptions = new JsonSerializerOptions { ReferenceHandler = ReferenceHandler.IgnoreCycles };
-                await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(filtro.Solicitudes, jsonOptions), options);
+                var jsonOpts = new JsonSerializerOptions { ReferenceHandler = ReferenceHandler.IgnoreCycles };
+                await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(filtro.Solicitudes, jsonOpts), options);
             }
 
             return View(filtro);
@@ -87,7 +85,6 @@ namespace PRACTICA_NRO_2_TEORIA_20262.Controllers
 
             if (solicitud == null) return NotFound();
 
-            // 3. GUARDAR EN SESIÓN LA ÚLTIMA SOLICITUD VISITADA
             HttpContext.Session.SetInt32("UltimaSolicitudId", id);
 
             return View(solicitud);
@@ -125,14 +122,67 @@ namespace PRACTICA_NRO_2_TEORIA_20262.Controllers
                 return View(model);
             }
 
+            // 1. Guardar la solicitud en BD
             var nuevaSolicitud = new SolicitudCredito { ClienteId = cliente.Id, MontoSolicitado = model.MontoSolicitado, FechaSolicitud = DateTime.UtcNow, Estado = EstadoSolicitud.Pendiente };
             _context.Solicitudes.Add(nuevaSolicitud);
             await _context.SaveChangesAsync();
 
-            // 4. INVALIDAR EL CACHÉ PARA QUE SE REFLEJE EL NUEVO REGISTRO
+            // 2. Invalidar caché
             await _cache.RemoveAsync($"solicitudes_{userId}");
 
-            TempData["MensajeExito"] = "Tu solicitud se ha registrado correctamente.";
+            // 3. PUBLICAR MENSAJE EN RABBITMQ
+            bool notificacionEnviada = false;
+            try
+            {
+                var factory = new ConnectionFactory()
+                {
+                    Uri = new Uri(_config["RabbitMq:ConnectionString"]!)
+                };
+
+                using var connection = factory.CreateConnection();
+                using var channel = connection.CreateModel();
+
+                string queueName = _config["RabbitMq:QueueName"]!;
+                
+                // Declarar la cola durable
+                channel.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
+                
+                // Activar confirmaciones de publicador (Requisito del examen)
+                channel.ConfirmSelect();
+
+                var mensajeData = new
+                {
+                    MessageId = Guid.NewGuid().ToString(),
+                    SolicitudId = nuevaSolicitud.Id,
+                    UsuarioId = userId,
+                    FechaEventoUtc = DateTime.UtcNow
+                };
+
+                var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(mensajeData));
+                var properties = channel.CreateBasicProperties();
+                properties.Persistent = true; // Mensaje persistente
+
+                channel.BasicPublish(exchange: "", routingKey: queueName, basicProperties: properties, body: body);
+                
+                // Esperar confirmación
+                channel.WaitForConfirmsOrDie(TimeSpan.FromSeconds(5));
+                notificacionEnviada = true;
+            }
+            catch (Exception ex)
+            {
+                // Registrar el error en consola pero no detener el flujo
+                Console.WriteLine($"Error al encolar notificación: {ex.Message}");
+            }
+
+            if (notificacionEnviada)
+            {
+                TempData["MensajeExito"] = "Tu solicitud se ha registrado y la notificación está en proceso.";
+            }
+            else
+            {
+                TempData["MensajeExito"] = "Tu solicitud se registró con éxito, pero hubo un problema al enviar la notificación. (Reenvío manual requerido).";
+            }
+
             return RedirectToAction(nameof(MisSolicitudes));
         }
     }

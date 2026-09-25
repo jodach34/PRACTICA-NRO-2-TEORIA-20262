@@ -46,7 +46,7 @@ namespace PRACTICA_NRO_2_TEORIA_20262.Migrations
                         new
                         {
                             Id = "rol-analista-id",
-                            ConcurrencyStamp = "16952edc-1908-4978-96e9-0839b7c20558",
+                            ConcurrencyStamp = "6716467b-df06-470e-b0b3-82c2dced0c27",
                             Name = "Analista",
                             NormalizedName = "ANALISTA"
                         });
@@ -143,15 +143,15 @@ namespace PRACTICA_NRO_2_TEORIA_20262.Migrations
                         {
                             Id = "user-analista-id",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "ffab50b0-8e1b-4de0-9547-8c729192b988",
+                            ConcurrencyStamp = "af3b2c74-7005-4135-bd58-cb69d8e4e409",
                             Email = "analista@banco.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "ANALISTA@BANCO.COM",
                             NormalizedUserName = "ANALISTA@BANCO.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEHInnejtP5rUaBb9o0siBZpohY9zve0yASAQqRqOOnSII1U4A7i4k5JztGq58jBrBQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAY4IPvVnWCrbOwnlAYDKlG0AMs0amyhr2TGnCP3SM31nnHSgI0yhT+WOrkj75YwCQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "2fb6fd2e-ec37-42dd-9f47-7e1103444351",
+                            SecurityStamp = "146c83bb-e120-4941-8cad-5ee083f0dc57",
                             TwoFactorEnabled = false,
                             UserName = "analista@banco.com"
                         },
@@ -159,15 +159,15 @@ namespace PRACTICA_NRO_2_TEORIA_20262.Migrations
                         {
                             Id = "user-cliente1-id",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "e39a2e11-f8d2-4e6e-8e97-580e0ea0fa20",
+                            ConcurrencyStamp = "ac80ea8f-5a61-4c4c-919e-08b1b2520ad0",
                             Email = "cliente1@banco.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "CLIENTE1@BANCO.COM",
                             NormalizedUserName = "CLIENTE1@BANCO.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAECKGWHxkjecf8ZiKWnDV1d9Tjre5Enve5qMTn8sYE6jAeDWEdXwfk/6ZSgSfGalx2Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGo3QVy35gzMxNZvKIsI/YButCgWGwybWWm9FN/nPBveY+OUPy90xOKgVR1LpBOkvA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "06b6fa18-bd5d-4df8-b6e1-727f0b99f4fc",
+                            SecurityStamp = "b19f579d-4ec0-4429-9314-81bc1144863d",
                             TwoFactorEnabled = false,
                             UserName = "cliente1@banco.com"
                         },
@@ -175,15 +175,15 @@ namespace PRACTICA_NRO_2_TEORIA_20262.Migrations
                         {
                             Id = "user-cliente2-id",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "666fe367-859f-4af1-88c7-ce62f4d76c03",
+                            ConcurrencyStamp = "70daac08-74c5-43d5-badf-369644f55d60",
                             Email = "cliente2@banco.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "CLIENTE2@BANCO.COM",
                             NormalizedUserName = "CLIENTE2@BANCO.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPCDk1ihqCabU9LTdJQpTKLVC5rVyoWzLKt3ENDWr9TjpGzQi5DC68b49jsNJgXSJw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEG/LCdvHa3XjEOErvM5JX0wRmZ+szwVPikZvLhsHmA02fMO9OOg7pkMrIWisFRqAYA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "183a344d-f021-4e2e-b987-c679b53157a1",
+                            SecurityStamp = "99ad1475-a13f-4dbe-ad86-f27c06e15aec",
                             TwoFactorEnabled = false,
                             UserName = "cliente2@banco.com"
                         });
@@ -314,6 +314,35 @@ namespace PRACTICA_NRO_2_TEORIA_20262.Migrations
                             IngresosMensuales = 3000m,
                             UsuarioId = "user-cliente2-id"
                         });
+                });
+
+            modelBuilder.Entity("PRACTICA_NRO_2_TEORIA_20262.Models.Notificacion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("FechaProcesamientoUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("MessageId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SolicitudId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Texto")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UsuarioId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Notificaciones");
                 });
 
             modelBuilder.Entity("PRACTICA_NRO_2_TEORIA_20262.Models.SolicitudCredito", b =>
