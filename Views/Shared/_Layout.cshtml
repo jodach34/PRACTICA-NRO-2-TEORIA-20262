@@ -23,10 +23,18 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <!-- ENLACE AGREGADO AQUÍ -->
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Solicitudes" asp-action="MisSolicitudes">Mis Solicitudes</a>
                         </li>
+                        
+                        <!-- ENLACE PARA EL ANALISTA AGREGADO AQUÍ -->
+                        @if (User.IsInRole("Analista"))
+                        {
+                            <li class="nav-item fw-bold">
+                                <a class="nav-link text-danger" asp-area="" asp-controller="Analista" asp-action="Index">Panel Analista</a>
+                            </li>
+                        }
+
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
