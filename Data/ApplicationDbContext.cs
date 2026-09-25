@@ -15,13 +15,16 @@ public class ApplicationDbContext : IdentityDbContext
     // Nuestras tablas
     public DbSet<Cliente> Clientes { get; set; }
     public DbSet<SolicitudCredito> Solicitudes { get; set; }
-protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    public DbSet<Notificacion> Notificaciones { get; set; } // <- LÍNEA NUEVA AGREGADA
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.ConfigureWarnings(warnings => 
             warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
         
         base.OnConfiguring(optionsBuilder);
     }
+    
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -67,9 +70,9 @@ protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         );
 
         // 5. Crear 2 Solicitudes (Una Pendiente y Una Aprobada)
-    builder.Entity<SolicitudCredito>().HasData(
-        new SolicitudCredito { Id = 1, ClienteId = 1, MontoSolicitado = 5000m, FechaSolicitud = new DateTime(2026, 1, 1, 12, 0, 0, DateTimeKind.Utc), Estado = EstadoSolicitud.Pendiente },
-        new SolicitudCredito { Id = 2, ClienteId = 2, MontoSolicitado = 1000m, FechaSolicitud = new DateTime(2026, 1, 2, 12, 0, 0, DateTimeKind.Utc), Estado = EstadoSolicitud.Aprobado }
-    );
+        builder.Entity<SolicitudCredito>().HasData(
+            new SolicitudCredito { Id = 1, ClienteId = 1, MontoSolicitado = 5000m, FechaSolicitud = new DateTime(2026, 1, 1, 12, 0, 0, DateTimeKind.Utc), Estado = EstadoSolicitud.Pendiente },
+            new SolicitudCredito { Id = 2, ClienteId = 2, MontoSolicitado = 1000m, FechaSolicitud = new DateTime(2026, 1, 2, 12, 0, 0, DateTimeKind.Utc), Estado = EstadoSolicitud.Aprobado }
+        );
     }
 }
