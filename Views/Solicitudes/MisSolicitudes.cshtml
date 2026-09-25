@@ -14,7 +14,6 @@
         </div>
     }
 
-    <!-- Mensaje de éxito -->
     @if (TempData["MensajeExito"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
@@ -23,7 +22,6 @@
         </div>
     }
 
-    <!-- Botón para crear nueva solicitud -->
     <div class="mb-3 mt-3">
         <a asp-action="Crear" class="btn btn-success">Nueva Solicitud</a>
     </div>
@@ -32,8 +30,6 @@
     <div class="card mb-4">
         <div class="card-body">
             <form method="get" asp-action="MisSolicitudes">
-                <div asp-validation-summary="All" class="text-danger"></div>
-                
                 <div class="row g-3">
                     <div class="col-md-3">
                         <label class="form-label">Estado</label>
@@ -44,12 +40,10 @@
                     <div class="col-md-2">
                         <label class="form-label">Monto Mín.</label>
                         <input asp-for="MontoMinimo" type="number" step="0.01" class="form-control" />
-                        <span asp-validation-for="MontoMinimo" class="text-danger"></span>
                     </div>
                     <div class="col-md-2">
                         <label class="form-label">Monto Máx.</label>
                         <input asp-for="MontoMaximo" type="number" step="0.01" class="form-control" />
-                        <span asp-validation-for="MontoMaximo" class="text-danger"></span>
                     </div>
                     <div class="col-md-2">
                         <label class="form-label">Fecha Inicio</label>
@@ -83,12 +77,13 @@
             {
                 foreach (var item in Model.Solicitudes)
                 {
-                    <tr>
+                    <tr id="fila-@item.Id">
                         <td>@item.Id</td>
                         <td>@item.FechaSolicitud.ToString("dd/MM/yyyy HH:mm")</td>
                         <td>@item.MontoSolicitado.ToString("C")</td>
                         <td>
-                            <span class="badge @(item.Estado == PRACTICA_NRO_2_TEORIA_20262.Models.EstadoSolicitud.Aprobado ? "bg-success" : item.Estado == PRACTICA_NRO_2_TEORIA_20262.Models.EstadoSolicitud.Rechazado ? "bg-danger" : "bg-warning text-dark")">
+                            <!-- Agregamos un ID al badge para cambiarle el color e icono en tiempo real -->
+                            <span id="estado-@item.Id" class="badge @(item.Estado == PRACTICA_NRO_2_TEORIA_20262.Models.EstadoSolicitud.Aprobado ? "bg-success" : item.Estado == PRACTICA_NRO_2_TEORIA_20262.Models.EstadoSolicitud.Rechazado ? "bg-danger" : "bg-warning text-dark")">
                                 @item.Estado
                             </span>
                         </td>
@@ -107,3 +102,46 @@
         </tbody>
     </table>
 </div>
+
+@section Scripts {
+    <!-- CDN de SignalR para evitar problemas de instalación local -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    
+    <script>
+        // 1. Configurar la conexión con el Hub e implementar reconexión automática
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/hubs/solicitudes")
+            .withAutomaticReconnect()
+            .build();
+
+        // 2. Escuchar el evento que manda el AnalistaController
+        connection.on("SolicitudEstadoActualizado", function (id, estado, motivo) {
+            
+            // Mostrar un aviso al usuario de inmediato
+            let mensaje = `Tu solicitud #${id} acaba de ser actualizada a: ${estado}.`;
+            if (estado === "Rechazado" && motivo) {
+                mensaje += `\nMotivo: ${motivo}`;
+            }
+            alert("🔔 NOTIFICACIÓN EN TIEMPO REAL\n\n" + mensaje);
+
+            // 3. Actualizar la interfaz sin recargar la página
+            const badge = document.getElementById(`estado-${id}`);
+            if (badge) {
+                badge.innerText = estado;
+                badge.className = estado === "Aprobado" ? "badge bg-success" : "badge bg-danger";
+            }
+        });
+
+        // Evento de reconexión
+        connection.onreconnected(connectionId => {
+            console.log("Se ha restablecido la conexión WebSocket con el servidor.");
+        });
+
+        // 4. Iniciar la escucha
+        connection.start().then(function () {
+            console.log("Conectado exitosamente al WebSocket de Solicitudes");
+        }).catch(function (err) {
+            console.error(err.toString());
+        });
+    </script>
+}
