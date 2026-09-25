@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PRACTICA NRO 2 TEORIA 20262")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aefa507297f29a9e7baf9d2c1e1ec8320883a103")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e6c35ef7d3b8e61c3c53b8cb822a4a36ba7b2548")]
 [assembly: System.Reflection.AssemblyProductAttribute("PRACTICA NRO 2 TEORIA 20262")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PRACTICA NRO 2 TEORIA 20262")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

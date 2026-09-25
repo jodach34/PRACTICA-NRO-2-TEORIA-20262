@@ -13,7 +13,7 @@ namespace PRACTICA_NRO_2_TEORIA_20262.Services
         private readonly IConfiguration _config;
         private readonly IServiceScopeFactory _scopeFactory;
         private IConnection? _connection;
-        private IModel? _channel;
+        private IChannel? _channel;
 
         public NotificacionesConsumerService(IConfiguration config, IServiceScopeFactory scopeFactory)
         {
@@ -21,26 +21,32 @@ namespace PRACTICA_NRO_2_TEORIA_20262.Services
             _scopeFactory = scopeFactory;
         }
 
-        public override Task StartAsync(CancellationToken cancellationToken)
+        public override async Task StartAsync(CancellationToken cancellationToken)
         {
-            // Validamos si el consumidor está activado en appsettings.json
-            if (!_config.GetValue<bool>("RabbitMq:ConsumerEnabled")) return Task.CompletedTask;
+            if (!_config.GetValue<bool>("RabbitMq:ConsumerEnabled")) return;
 
             var factory = new ConnectionFactory() { Uri = new Uri(_config["RabbitMq:ConnectionString"]!) };
-            _connection = factory.CreateConnection();
-            _channel = _connection.CreateModel();
+            _connection = await factory.CreateConnectionAsync(cancellationToken);
+            _channel = await _connection.CreateChannelAsync(cancellationToken: cancellationToken);
             
-            _channel.QueueDeclare(queue: _config["RabbitMq:QueueName"]!, durable: true, exclusive: false, autoDelete: false, arguments: null);
+            await _channel.QueueDeclareAsync(
+                queue: _config["RabbitMq:QueueName"]!, 
+                durable: true, 
+                exclusive: false, 
+                autoDelete: false, 
+                arguments: null, 
+                cancellationToken: cancellationToken
+            );
 
-            return base.StartAsync(cancellationToken);
+            await base.StartAsync(cancellationToken);
         }
 
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            if (_channel == null) return Task.CompletedTask;
+            if (_channel == null) return;
 
-            var consumer = new EventingBasicConsumer(_channel);
-            consumer.Received += async (model, ea) =>
+            var consumer = new AsyncEventingBasicConsumer(_channel);
+            consumer.ReceivedAsync += async (model, ea) =>
             {
                 try
                 {
@@ -52,11 +58,9 @@ namespace PRACTICA_NRO_2_TEORIA_20262.Services
                     int solicitudId = data.GetProperty("SolicitudId").GetInt32();
                     string usuarioId = data.GetProperty("UsuarioId").GetString()!;
 
-                    // El DbContext se debe instanciar por cada mensaje en un BackgroundService
                     using var scope = _scopeFactory.CreateScope();
                     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-                    // Validación de duplicados (Idempotencia)
                     bool existe = context.Notificaciones.Any(n => n.MessageId == messageId);
                     if (!existe)
                     {
@@ -72,30 +76,31 @@ namespace PRACTICA_NRO_2_TEORIA_20262.Services
                         await context.SaveChangesAsync();
                     }
                     
-                    // Confirmación manual (ACK) solo DESPUÉS de guardar en BD
-                    _channel.BasicAck(ea.DeliveryTag, multiple: false);
+                    await _channel.BasicAckAsync(ea.DeliveryTag, multiple: false);
                 }
                 catch (JsonException)
                 {
-                    // Mensaje inválido, rechazar sin reencolar
-                    _channel.BasicNack(ea.DeliveryTag, multiple: false, requeue: false);
+                    await _channel.BasicNackAsync(ea.DeliveryTag, multiple: false, requeue: false);
                 }
                 catch (Exception ex)
                 {
-                    // Error general, rechazar sin reencolar para evitar loops infinitos (según reglas del examen)
                     Console.WriteLine($"Error procesando mensaje MQ: {ex.Message}");
-                    _channel.BasicNack(ea.DeliveryTag, multiple: false, requeue: false);
+                    await _channel.BasicNackAsync(ea.DeliveryTag, multiple: false, requeue: false);
                 }
             };
 
-            _channel.BasicConsume(queue: _config["RabbitMq:QueueName"]!, autoAck: false, consumer: consumer);
-            return Task.CompletedTask;
+            await _channel.BasicConsumeAsync(
+                queue: _config["RabbitMq:QueueName"]!, 
+                autoAck: false, 
+                consumer: consumer, 
+                cancellationToken: stoppingToken
+            );
         }
 
-        public override void Dispose()
+        public override async void Dispose()
         {
-            _channel?.Dispose();
-            _connection?.Dispose();
+            if (_channel != null) await _channel.DisposeAsync();
+            if (_connection != null) await _connection.DisposeAsync();
             base.Dispose();
         }
     }

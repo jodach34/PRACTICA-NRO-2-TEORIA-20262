@@ -18,7 +18,7 @@ namespace PRACTICA_NRO_2_TEORIA_20262.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IDistributedCache _cache;
-        private readonly IConfiguration _config; // <-- Agregamos para leer el appsettings.json
+        private readonly IConfiguration _config;
 
         public SolicitudesController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IDistributedCache cache, IConfiguration config)
         {
@@ -28,7 +28,6 @@ namespace PRACTICA_NRO_2_TEORIA_20262.Controllers
             _config = config;
         }
 
-        // GET: Solicitudes/MisSolicitudes
         public async Task<IActionResult> MisSolicitudes(FiltroSolicitudesViewModel filtro)
         {
             var userId = _userManager.GetUserId(User);
@@ -77,7 +76,6 @@ namespace PRACTICA_NRO_2_TEORIA_20262.Controllers
             return View(filtro);
         }
 
-        // GET: Solicitudes/Detalle/5
         public async Task<IActionResult> Detalle(int id)
         {
             var userId = _userManager.GetUserId(User);
@@ -130,7 +128,7 @@ namespace PRACTICA_NRO_2_TEORIA_20262.Controllers
             // 2. Invalidar caché
             await _cache.RemoveAsync($"solicitudes_{userId}");
 
-            // 3. PUBLICAR MENSAJE EN RABBITMQ
+            // 3. PUBLICAR MENSAJE EN RABBITMQ (RabbitMQ v7+ asíncrono)
             bool notificacionEnviada = false;
             try
             {
@@ -139,16 +137,12 @@ namespace PRACTICA_NRO_2_TEORIA_20262.Controllers
                     Uri = new Uri(_config["RabbitMq:ConnectionString"]!)
                 };
 
-                using var connection = factory.CreateConnection();
-                using var channel = connection.CreateModel();
+                using var connection = await factory.CreateConnectionAsync();
+                using var channel = await connection.CreateChannelAsync();
 
                 string queueName = _config["RabbitMq:QueueName"]!;
                 
-                // Declarar la cola durable
-                channel.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
-                
-                // Activar confirmaciones de publicador (Requisito del examen)
-                channel.ConfirmSelect();
+                await channel.QueueDeclareAsync(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
 
                 var mensajeData = new
                 {
@@ -159,18 +153,14 @@ namespace PRACTICA_NRO_2_TEORIA_20262.Controllers
                 };
 
                 var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(mensajeData));
-                var properties = channel.CreateBasicProperties();
-                properties.Persistent = true; // Mensaje persistente
+                var properties = new BasicProperties { Persistent = true };
 
-                channel.BasicPublish(exchange: "", routingKey: queueName, basicProperties: properties, body: body);
+                await channel.BasicPublishAsync(exchange: "", routingKey: queueName, mandatory: true, basicProperties: properties, body: body);
                 
-                // Esperar confirmación
-                channel.WaitForConfirmsOrDie(TimeSpan.FromSeconds(5));
                 notificacionEnviada = true;
             }
             catch (Exception ex)
             {
-                // Registrar el error en consola pero no detener el flujo
                 Console.WriteLine($"Error al encolar notificación: {ex.Message}");
             }
 
