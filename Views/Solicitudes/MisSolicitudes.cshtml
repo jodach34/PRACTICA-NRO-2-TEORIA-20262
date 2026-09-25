@@ -14,6 +14,20 @@
         </div>
     }
 
+    <!-- Mensaje de éxito -->
+    @if (TempData["MensajeExito"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+            @TempData["MensajeExito"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Botón para crear nueva solicitud -->
+    <div class="mb-3 mt-3">
+        <a asp-action="Crear" class="btn btn-success">Nueva Solicitud</a>
+    </div>
+
     <!-- Formulario de Filtros -->
     <div class="card mb-4">
         <div class="card-body">

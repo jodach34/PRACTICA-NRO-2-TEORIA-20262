@@ -1,0 +1,33 @@
+@model PRACTICA_NRO_2_TEORIA_20262.Models.RegistroSolicitudViewModel
+
+@{
+    ViewData["Title"] = "Nueva Solicitud";
+}
+
+<div class="container mt-4">
+    <h2>Registrar Nueva Solicitud de Crédito</h2>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mt-3">
+                <div class="card-body">
+                    <form asp-action="Crear" method="post">
+                        <!-- Aquí se muestran los errores de las reglas de negocio (rojo) -->
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3 fw-bold"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="MontoSolicitado" class="form-label"></label>
+                            <input asp-for="MontoSolicitado" class="form-control" type="number" step="0.01" />
+                            <span asp-validation-for="MontoSolicitado" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Registrar Solicitud</button>
+                            <a asp-action="MisSolicitudes" class="btn btn-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
