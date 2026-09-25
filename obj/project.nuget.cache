@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "8rj3s2Gzktw=",
+  "dgSpecHash": "Up6DkJBZ8YM=",
   "success": true,
-  "projectFilePath": "C:\\Users\\JOEL CONDOR\\Desktop\\PROGRAMACION 1\\PRACTICA NRO 2 TEORIA 20262\\PRACTICA NRO 2 TEORIA 20262.csproj",
+  "projectFilePath": "c:\\Users\\JOEL CONDOR\\Desktop\\PROGRAMACION 1\\PRACTICA NRO 2 TEORIA 20262\\PRACTICA NRO 2 TEORIA 20262.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\JOEL CONDOR\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\JOEL CONDOR\\.nuget\\packages\\microsoft.aspnetcore.diagnostics.entityframeworkcore\\10.0.11\\microsoft.aspnetcore.diagnostics.entityframeworkcore.10.0.11.nupkg.sha512",
